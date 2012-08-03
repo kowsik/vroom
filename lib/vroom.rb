@@ -40,9 +40,8 @@ class Vroom < Sinatra::Application
 
   aget '/async' do
     delay = params[:delay].to_i rescue 0
-    sleep(delay/1000.0) unless delay.zero?
-    body do
-      "#{delay} ms"
+    EM.add_timer(delay/1000.0) do 
+      body "#{delay} ms"
     end
   end
 end
