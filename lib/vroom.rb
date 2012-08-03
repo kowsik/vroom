@@ -28,4 +28,10 @@ class Vroom < Sinatra::Application
   get '/gc_count' do
     haml :gc_count
   end
+
+  get '/concurrency' do
+    delay = params[:delay].to_i rescue 0
+    sleep(delay/1000.0) unless delay.zero?
+    "#{delay} ms"
+  end
 end
