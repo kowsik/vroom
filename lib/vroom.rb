@@ -24,4 +24,8 @@ class Vroom < Sinatra::Application
       'doing the GC thing'
     end
   end
+
+  get '/gc_count' do
+    haml :gc_count
+  end
 end
