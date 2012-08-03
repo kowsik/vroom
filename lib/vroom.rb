@@ -1,6 +1,9 @@
 require 'sinatra'
+require 'sinatra/async'
 
 class Vroom < Sinatra::Application
+  register Sinatra::Async
+
   GC_INTERVAL = (ENV['GC_INTERVAL'] || 1000).to_f/1000.0
 
   puts "GC_INTERVAL = #{GC_INTERVAL}s"
@@ -29,9 +32,17 @@ class Vroom < Sinatra::Application
     haml :gc_count
   end
 
-  get '/concurrency' do
+  get '/sync' do
     delay = params[:delay].to_i rescue 0
     sleep(delay/1000.0) unless delay.zero?
     "#{delay} ms"
+  end
+
+  aget '/async' do
+    delay = params[:delay].to_i rescue 0
+    sleep(delay/1000.0) unless delay.zero?
+    body do
+      "#{delay} ms"
+    end
   end
 end
