@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'sinatra/async'
+require 'pool'
 
 class Vroom < Sinatra::Application
   register Sinatra::Async
@@ -43,5 +44,26 @@ class Vroom < Sinatra::Application
     EM.add_timer(delay/1000.0) do 
       body "#{delay} ms"
     end
+  end
+
+  def self.pool
+    @@pool ||= Pool.new(10)
+  end
+
+  def self.queue
+    @@queue ||= Queue.new
+  end
+
+  aget '/pool' do
+    delay = params[:delay].to_i rescue 0
+
+    Vroom.pool.schedule do
+      sleep(delay/1000.0) unless delay.zero?
+      Vroom.queue << true
+    end
+
+    op = proc { Vroom.queue.pop }
+    cb = proc { body "ok" }
+    EM.defer op, cb
   end
 end
