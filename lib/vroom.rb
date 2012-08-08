@@ -8,10 +8,9 @@ class Vroom < Sinatra::Application
   GC_INTERVAL = (ENV['GC_INTERVAL'] || 1000).to_f/1000.0
 
   puts "GC_INTERVAL = #{GC_INTERVAL}s"
-  GC.disable
 
   def self.do_gc_thing
-    @@interval ||= Time.now.to_f
+    @@interval ||= proc { GC.disable; Time.now.to_f }.call
     now = Time.now.to_f
     if now - @@interval >= 1.0
       @@interval = now
